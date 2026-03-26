@@ -47,14 +47,39 @@ Le fichier source des entrées est [entries.json](entries.json).
 
 1. Ouvre [entries.json](entries.json) dans VS Code.
 2. Ajoute/modifie tes entités (format JSON, tableau d'objets).
-3. Recharge l'app: [index.html](index.html) charge `entries.json` en priorité.
-4. Commit/push:
+3. Pour créer un **nouveau tag**, ajoute-le simplement dans le tableau `tags` d'une entrée.
+4. Recharge l'app: [index.html](index.html) charge `entries.json` en priorité.
+5. Commit/push:
 
 ```bash
 git add entries.json index.html README.md
 git commit -m "Ajout de nouvelles entités"
 git push
 ```
+
+### Exemple d'entrée
+
+```json
+{
+	"id": "8.1",
+	"niveau": "National",
+	"chapitre": "8",
+	"acronyme": "EXEMPLE",
+	"nom_complet": "Exemple d'entité",
+	"titre_brut": "EXEMPLE — Exemple d'entité",
+	"nature": "Description de la nature de l'entité",
+	"role_permitting": "Rôle dans le permitting",
+	"fondement_juridique": "Références juridiques",
+	"se_rapporte_a": "Acteurs liés",
+	"tags": ["instruction", "nouveau-tag"]
+}
+```
+
+### Bonnes pratiques tags
+
+- Utiliser une orthographe cohérente (`énergie` vs `energie`).
+- Éviter les doublons proches (`région` et `Region`).
+- Conserver des tags courts et réutilisables.
 
 Notes:
 - Si `entries.json` n'est pas disponible, l'app utilise les données embarquées dans [index.html](index.html).
