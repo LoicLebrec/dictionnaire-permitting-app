@@ -41,6 +41,25 @@
 | `se_rapporte_a` | Entités en relation |
 | `tags` | Tags thématiques (séparés par `;` en CSV) |
 
+## Workflow VS Code (ajouter puis push)
+
+Le fichier source des entrées est [entries.json](entries.json).
+
+1. Ouvre [entries.json](entries.json) dans VS Code.
+2. Ajoute/modifie tes entités (format JSON, tableau d'objets).
+3. Recharge l'app: [index.html](index.html) charge `entries.json` en priorité.
+4. Commit/push:
+
+```bash
+git add entries.json index.html README.md
+git commit -m "Ajout de nouvelles entités"
+git push
+```
+
+Notes:
+- Si `entries.json` n'est pas disponible, l'app utilise les données embarquées dans [index.html](index.html).
+- Le bouton "Lier ce HTML" reste disponible pour un mode purement local avec écriture directe dans le fichier HTML.
+
 ## Source
 
 Données extraites du *Dictionnaire du Processus de Permitting en France — Par niveau institutionnel* (PDF LaTeX, 106 pages).
