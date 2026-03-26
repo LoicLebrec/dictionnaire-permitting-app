@@ -776,12 +776,10 @@
       <button class="sep-btn active" data-sep=",">Virgule</button>
       <button class="sep-btn" data-sep=";">Point-virgule</button>
       <button class="sep-btn" data-sep="tab">Tab</button>
-      <button class="btn btn-sec" id="btn-link-html">Lier ce HTML</button>
-      <button class="btn btn-sec" id="btn-save-html">Enregistrer HTML</button>
       <button class="btn btn-sec" id="btn-new-entry">+ Entrée</button>
       <button class="btn btn-primary" id="btn-csv">⬇ CSV</button>
       <button class="btn btn-sec" id="btn-json">⬇ JSON</button>
-      <span class="csv-status" id="csv-status">Aucun HTML lié</span>
+      <span class="csv-status" id="csv-status">Chargement de la source…</span>
     </div>
   </div>
 
@@ -820,7 +818,6 @@
       filtered: ALL_ENTRIES,
       selected: null,
       sep: ',',
-      htmlHandle: null,
       filterLevel: 'all',
       search: '',
       activeTags: new Set(),
@@ -860,8 +857,6 @@
       }));
       document.getElementById('btn-csv').addEventListener('click', exportCSV);
       document.getElementById('btn-json').addEventListener('click', exportJSON);
-      document.getElementById('btn-link-html').addEventListener('click', linkHtmlFile);
-      document.getElementById('btn-save-html').addEventListener('click', () => saveEntriesToLinkedHtml(true));
       document.getElementById('btn-new-entry').addEventListener('click', openEntryModal);
       document.getElementById('btn-cancel-entry').addEventListener('click', closeEntryModal);
       document.getElementById('entry-modal').addEventListener('click', e => { if (e.target.id === 'entry-modal') closeEntryModal(); });
@@ -1020,10 +1015,6 @@
       refreshMetaUi();
       applyFilters();
 
-      if (state.htmlHandle) {
-        await saveEntriesToLinkedHtml(false);
-      }
-
       e.target.reset();
       closeEntryModal();
     }
@@ -1089,146 +1080,6 @@
       const el = document.getElementById('csv-status');
       el.textContent = msg;
       el.style.color = isError ? '#B91C1C' : 'var(--text-muted)';
-    }
-
-    function detectSeparator(headerLine) {
-      const candidates = [',', ';', '\t'];
-      let winner = ',';
-      let maxCount = -1;
-      candidates.forEach(sep => {
-        const c = (headerLine.match(new RegExp(sep === '\\t' ? '\\t' : `\\${sep}`, 'g')) || []).length;
-        if (c > maxCount) {
-          maxCount = c;
-          winner = sep;
-        }
-      });
-      return winner;
-    }
-
-    function splitCsvRows(text) {
-      const rows = [];
-      let cur = '';
-      let q = false;
-      for (let i = 0; i < text.length; i++) {
-        const ch = text[i];
-        const nx = text[i + 1];
-        if (ch === '"') {
-          if (q && nx === '"') { cur += '"'; i++; }
-          else { q = !q; }
-        } else if ((ch === '\n' || ch === '\r') && !q) {
-          if (cur.trim()) rows.push(cur);
-          cur = '';
-          if (ch === '\r' && nx === '\n') i++;
-        } else {
-          cur += ch;
-        }
-      }
-      if (cur.trim()) rows.push(cur);
-      return rows;
-    }
-
-    function parseCsvRow(row, sep) {
-      const cols = [];
-      let cur = '';
-      let q = false;
-      for (let i = 0; i < row.length; i++) {
-        const ch = row[i];
-        const nx = row[i + 1];
-        if (ch === '"') {
-          if (q && nx === '"') { cur += '"'; i++; }
-          else { q = !q; }
-        } else if (ch === sep && !q) {
-          cols.push(cur);
-          cur = '';
-        } else {
-          cur += ch;
-        }
-      }
-      cols.push(cur);
-      return cols;
-    }
-
-    function extractEmbeddedEntriesFromHtml(text) {
-      const m = text.match(/const ALL_ENTRIES = (\[[\s\S]*?\]);/);
-      if (!m) return null;
-      try {
-        const parsed = JSON.parse(m[1]);
-        return Array.isArray(parsed) ? parsed : null;
-      } catch {
-        return null;
-      }
-    }
-
-    function replaceEmbeddedEntriesInHtml(text, entries) {
-      const replacement = `const ALL_ENTRIES = ${JSON.stringify(entries)};`;
-      return text.replace(/const ALL_ENTRIES = \[[\s\S]*?\];/, replacement);
-    }
-
-    async function linkHtmlFile() {
-      if (!('showOpenFilePicker' in window)) {
-        setCsvStatus('API d\'écriture locale non supportée sur ce navigateur', true);
-        return;
-      }
-
-      try {
-        const [handle] = await window.showOpenFilePicker({
-          types: [{ description: 'HTML', accept: { 'text/html': ['.html', '.htm'] } }],
-          excludeAcceptAllOption: false,
-          multiple: false,
-        });
-        if (!handle) return;
-
-        state.htmlHandle = handle;
-        const file = await handle.getFile();
-        const text = await file.text();
-        const parsedEntries = extractEmbeddedEntriesFromHtml(text);
-
-        if (parsedEntries && parsedEntries.length) {
-          state.entries = parsedEntries;
-          state.selected = null;
-          state.activeTags.clear();
-          state.filterLevel = 'all';
-          state.search = '';
-          document.getElementById('search').value = '';
-        }
-
-        refreshMetaUi();
-        applyFilters();
-        setCsvStatus(`HTML lié: ${handle.name}`);
-      } catch (err) {
-        setCsvStatus('Liaison HTML annulée', false);
-      }
-    }
-
-    async function saveEntriesToLinkedHtml(showMessage) {
-      if (!state.htmlHandle) {
-        setCsvStatus('Aucun HTML lié: clique sur "Lier ce HTML"', true);
-        return;
-      }
-
-      try {
-        const perm = await state.htmlHandle.queryPermission({ mode: 'readwrite' });
-        const granted = perm === 'granted' ? 'granted' : await state.htmlHandle.requestPermission({ mode: 'readwrite' });
-        if (granted !== 'granted') {
-          setCsvStatus('Permission d\'écriture refusée', true);
-          return;
-        }
-
-        const file = await state.htmlHandle.getFile();
-        const text = await file.text();
-        const updated = replaceEmbeddedEntriesInHtml(text, state.entries);
-        if (updated === text) {
-          setCsvStatus('Impossible de trouver ALL_ENTRIES dans le HTML', true);
-          return;
-        }
-
-        const writable = await state.htmlHandle.createWritable();
-        await writable.write(updated);
-        await writable.close();
-        if (showMessage) setCsvStatus(`HTML enregistré: ${state.htmlHandle.name}`);
-      } catch (err) {
-        setCsvStatus('Échec de l\'enregistrement HTML', true);
-      }
     }
 
     boot();

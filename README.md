@@ -58,7 +58,6 @@ git push
 
 Notes:
 - Si `entries.json` n'est pas disponible, l'app utilise les données embarquées dans [index.html](index.html).
-- Le bouton "Lier ce HTML" reste disponible pour un mode purement local avec écriture directe dans le fichier HTML.
 
 ## Source
 
