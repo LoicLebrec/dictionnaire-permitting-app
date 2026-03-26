@@ -11,22 +11,22 @@
     rel="stylesheet">
   <style>
     :root {
-      --bg: #F6F4F0;
-      --bg-card: #FFF;
-      --bg-inset: #EDEAE4;
-      --bg-code: #F0EDE7;
-      --border: #D8D3CA;
-      --border-light: #E8E4DD;
-      --text: #1A1A1A;
-      --text-sec: #5C5850;
-      --text-muted: #908A7E;
-      --accent: #1D4ED8;
-      --accent-light: #DBEAFE;
-      --accent-dark: #1E3A8A;
+      --bg: #F6F6F8;
+      --bg-card: #FFFFFF;
+      --bg-inset: #EEEEF3;
+      --bg-code: #F2F2F7;
+      --border: #D6D6E3;
+      --border-light: #E4E4EE;
+      --text: #161616;
+      --text-sec: #3A3A4A;
+      --text-muted: #66667A;
+      --accent: #000091;
+      --accent-light: #E3E3FD;
+      --accent-dark: #00005A;
       --green: #16A34A;
       --green-bg: #DCFCE7;
-      --radius: 8px;
-      --radius-lg: 12px;
+      --radius: 10px;
+      --radius-lg: 14px;
       --shadow: 0 1px 3px rgba(0, 0, 0, .06);
       --shadow-lg: 0 4px 12px rgba(0, 0, 0, .08);
       --fd: 'Source Serif 4', 'Georgia', serif;
@@ -50,8 +50,10 @@
 
     /* Banner */
     .banner {
-      background: linear-gradient(135deg, #0C1A3A 0%, #1E3A6E 60%, #2D4A8E 100%);
-      padding: 24px 32px 20px;
+      background:
+        radial-gradient(circle at 8% -20%, rgba(255, 255, 255, .18) 0%, rgba(255, 255, 255, 0) 44%),
+        linear-gradient(130deg, #1B1B35 0%, #23235A 58%, #2B2B78 100%);
+      padding: 28px 32px 22px;
       position: relative;
       overflow: hidden
     }
@@ -63,21 +65,22 @@
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(90deg, #002395 33%, #FFF 33%, #FFF 66%, #ED2939 66%)
+      background: linear-gradient(90deg, #6A6AF4 0%, #A3A3FF 100%)
     }
 
     .banner h1 {
       font-family: var(--fd);
-      font-size: 20px;
+      font-size: 26px;
       font-weight: 700;
       color: #FFF;
       letter-spacing: -.02em
     }
 
     .banner p {
-      font-size: 12px;
-      color: rgba(255, 255, 255, .5);
-      margin-top: 3px
+      font-size: 13px;
+      color: rgba(255, 255, 255, .78);
+      margin-top: 6px;
+      max-width: 880px
     }
 
     .banner .stats {
@@ -105,10 +108,31 @@
       background: var(--bg-card);
       border-bottom: 1px solid var(--border);
       display: flex;
-      gap: 12px;
+      gap: 14px;
       flex-wrap: wrap;
       align-items: center;
-      box-shadow: var(--shadow)
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 20
+    }
+
+    .control-group {
+      display: grid;
+      gap: 4px;
+      min-width: 210px
+    }
+
+    .control-group label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--text-muted)
+    }
+
+    .control-search {
+      flex: 1 1 320px
     }
 
     .toolbar input,
@@ -129,13 +153,24 @@
     }
 
     .toolbar input {
-      width: 280px
+      width: 100%
     }
 
     .filter-count {
       font-size: 12px;
       color: var(--text-muted);
       margin-left: auto
+    }
+
+    .btn-ghost {
+      border: 1px solid transparent;
+      background: var(--bg-inset);
+      color: var(--text-sec)
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--border);
+      background: var(--bg-card)
     }
 
     /* Tag filter bar */
@@ -203,6 +238,16 @@
       padding: 20px 32px 60px;
       max-width: 1400px;
       margin: 0 auto
+    }
+
+    .ui-hint {
+      margin-bottom: 14px;
+      padding: 11px 14px;
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+      background: #FFFDF8;
+      color: var(--text-sec);
+      font-size: 13px
     }
 
     /* Detail panel */
@@ -347,7 +392,15 @@
     }
 
     tbody tr.selected {
-      background: #D0DFFF
+      background: #E8E8FF
+    }
+
+    .empty-row {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 28px 12px;
+      font-size: 13px;
+      background: #FCFBF8
     }
 
     .acr-cell {
@@ -740,10 +793,17 @@
   </div>
 
   <div class="toolbar">
-    <input type="text" id="search" placeholder="Rechercher (acronyme, nom, contenu)…">
-    <select id="level-filter">
-      <option value="all">Tous les niveaux</option>
-    </select>
+    <div class="control-group control-search">
+      <label for="search">Recherche globale</label>
+      <input type="text" id="search" placeholder="Acronyme, institution, rôle, fondement juridique...">
+    </div>
+    <div class="control-group">
+      <label for="level-filter">Filtre par niveau</label>
+      <select id="level-filter">
+        <option value="all">Tous les niveaux</option>
+      </select>
+    </div>
+    <button class="btn btn-ghost" id="btn-clear-filters" type="button">Réinitialiser les filtres</button>
     <span class="filter-count" id="filter-count"></span>
   </div>
 
@@ -752,6 +812,8 @@
   </div>
 
   <div class="main">
+    <div class="ui-hint">Astuce: cliquez sur une ligne pour ouvrir le détail complet, puis combinez filtres de niveau et
+      tags pour affiner rapidement.</div>
     <div id="detail"></div>
     <div class="table-wrap">
       <table>
@@ -761,10 +823,10 @@
             <th>Niveau</th>
             <th>Acronyme</th>
             <th>Nom</th>
-            <th>Nat.</th>
+            <th>Nature</th>
             <th>Rôle</th>
-            <th>Fond.</th>
-            <th>Rel.</th>
+            <th>Fondement</th>
+            <th>Réf.</th>
             <th>Tags</th>
           </tr>
         </thead>
@@ -776,9 +838,9 @@
       <button class="sep-btn active" data-sep=",">Virgule</button>
       <button class="sep-btn" data-sep=";">Point-virgule</button>
       <button class="sep-btn" data-sep="tab">Tab</button>
-      <button class="btn btn-sec" id="btn-new-entry">+ Entrée</button>
-      <button class="btn btn-primary" id="btn-csv">⬇ CSV</button>
-      <button class="btn btn-sec" id="btn-json">⬇ JSON</button>
+      <button class="btn btn-sec" id="btn-new-entry">+ Nouvelle entité</button>
+      <button class="btn btn-primary" id="btn-csv">Exporter CSV</button>
+      <button class="btn btn-sec" id="btn-json">Exporter JSON</button>
       <span class="csv-status" id="csv-status">Chargement de la source…</span>
     </div>
   </div>
@@ -850,6 +912,7 @@
       // Events
       document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; applyFilters(); });
       document.getElementById('level-filter').addEventListener('change', e => { state.filterLevel = e.target.value; applyFilters(); });
+      document.getElementById('btn-clear-filters').addEventListener('click', resetFilters);
       document.querySelectorAll('.sep-btn').forEach(b => b.addEventListener('click', () => {
         document.querySelectorAll('.sep-btn').forEach(x => x.classList.remove('active'));
         b.classList.add('active');
@@ -911,7 +974,7 @@
       bar.innerHTML = '<span class="tag-bar-label">Tags :</span>';
       getTagList().forEach(tag => {
         const pill = document.createElement('span');
-        pill.className = `tag-pill tag-${slugTag(tag)} inactive`;
+        pill.className = `tag-pill tag-${slugTag(tag)}`;
         pill.textContent = tag;
         pill.dataset.tag = tag;
         pill.addEventListener('click', () => toggleTag(tag));
@@ -919,9 +982,21 @@
       });
       const clear = document.createElement('span');
       clear.className = 'tag-clear';
-      clear.textContent = '✕ Reset';
+      clear.textContent = '✕ Effacer';
       clear.addEventListener('click', clearTags);
       bar.appendChild(clear);
+    }
+
+    function resetFilters() {
+      state.search = '';
+      state.filterLevel = 'all';
+      state.activeTags.clear();
+
+      document.getElementById('search').value = '';
+      document.getElementById('level-filter').value = 'all';
+      document.querySelectorAll('.tag-bar .tag-pill').forEach(p => { p.classList.remove('active', 'inactive'); });
+
+      applyFilters();
     }
 
     function toggleTag(tag) {
@@ -939,7 +1014,7 @@
 
     function clearTags() {
       state.activeTags.clear();
-      document.querySelectorAll('.tag-bar .tag-pill').forEach(p => { p.classList.remove('active'); p.classList.add('inactive'); });
+      document.querySelectorAll('.tag-bar .tag-pill').forEach(p => { p.classList.remove('active', 'inactive'); });
       applyFilters();
     }
 
@@ -1020,6 +1095,11 @@
     }
 
     function renderTable() {
+      if (!state.filtered.length) {
+        document.getElementById('tbody').innerHTML = '<tr><td class="empty-row" colspan="9">Aucun résultat. Essayez de retirer un tag ou d\'élargir votre recherche.</td></tr>';
+        return;
+      }
+
       document.getElementById('tbody').innerHTML = state.filtered.map((e, i) => `
     <tr data-idx="${i}" class="${state.selected === e ? 'selected' : ''}">
       <td style="color:var(--text-muted);white-space:nowrap">${e.id}</td>
